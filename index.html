@@ -41,14 +41,14 @@
 <body>
     <h1>출석 프로그램</h1>
     <form id="delete-form">
-        <h2>출석 삭제</h2>
+        <h2>출석</h2>
         <label for="student-id">학번:</label>
         <input type="text" id="student-id" required>
         <label for="student-name">이름:</label>
         <input type="text" id="student-name" required>
         <label for="student-code">코드:</label>
         <input type="text" id="student-code" required>
-        <button type="submit">삭제</button>
+        <button type="submit">확인</button>
     </form>
     <h2>출석 리스트</h2>
     <table id="attendance-table">
@@ -123,9 +123,9 @@
             if (reset) {
                 localStorage.removeItem('attendanceData');
                 location.reload(); // 페이지 새로고침
-                alert('출석 데이터가 초기화되었습니다.');
+                alert('목록을 초기화 합니다.');
             } else {
-                alert('현재 상태가 유지됩니다.');
+                alert('목록 초기화 금지.');
             }
         }
 
