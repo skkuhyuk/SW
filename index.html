@@ -40,7 +40,7 @@
 </head>
 <body>
     <h1>출석 프로그램</h1>
-    <form id="delete-form">
+    <form id="attendance-form">
         <h2>출석</h2>
         <label for="student-id">학번:</label>
         <input type="text" id="student-id" required>
@@ -59,7 +59,7 @@
             </tr>
         </thead>
         <tbody id="attendance-list">
-            <!-- 여기에 자동으로 추가될 내용 -->
+            <!-- 초기 데이터가 자동으로 추가될 예정 -->
         </tbody>
     </table>
 
@@ -121,7 +121,7 @@
             }
         });
 
-        document.getElementById('delete-form').addEventListener('submit', function(event) {
+        document.getElementById('attendance-form').addEventListener('submit', function(event) {
             event.preventDefault();
 
             const studentId = document.getElementById('student-id').value;
@@ -152,27 +152,23 @@
                 saveData();
             }
 
-            document.getElementById('delete-form').reset();
+            document.getElementById('attendance-form').reset();
         });
 
         // 데이터 저장
         function saveData() {
             localStorage.setItem('attendanceData', document.getElementById('attendance-list').innerHTML);
         }
-
-        // 관리자 기능
         function adminAction(reset) {
             if (reset) {
                 localStorage.removeItem('attendanceData');
                 location.reload(); // 페이지 새로고침
                 alert('출석 데이터가 초기화되었습니다.');
             } else {
-                alert('현재 상태가 유지됩니다...');
+                alert('현재 상태가 유지됩니다.');
             }
         }
-
-        // 관리자가 호출할 함수
-        adminAction(false); // 현재 상태 유지
+        adminAction(false);
     </script>
 </body>
 </html>
