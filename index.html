@@ -59,11 +59,11 @@
             </tr>
         </thead>
         <tbody>
-            <tr data-id="20222" data-name="김김김" data-code="156655">
+            <tr data-id="20222" data-name="김김김">
                 <td>김김김</td>
                 <td>20222</td>
             </tr>
-            <tr data-id="21222" data-name="이이이" data-code="">
+            <tr data-id="21222" data-name="이이이">
                 <td>이이이</td>
                 <td>21222</td>
             </tr>
@@ -71,6 +71,8 @@
     </table>
 
     <script>
+        const VALID_CODE = "156655"; // 모든 학생들이 동일한 코드
+
         document.getElementById('delete-form').addEventListener('submit', function(event) {
             event.preventDefault();
 
@@ -78,18 +80,23 @@
             const studentName = document.getElementById('student-name').value;
             const studentCode = document.getElementById('student-code').value;
 
+            if (studentCode !== VALID_CODE) {
+                alert('올바른 코드를 입력하세요.');
+                return;
+            }
+
             const rows = document.querySelectorAll('#attendance-table tbody tr');
             let found = false;
 
             rows.forEach(row => {
-                if (row.dataset.id === studentId && row.dataset.name === studentName && row.dataset.code === studentCode) {
+                if (row.dataset.id === studentId && row.dataset.name === studentName) {
                     row.remove();
                     found = true;
                 }
             });
 
             if (!found) {
-                alert('학번, 이름, 코드가 일치하지 않습니다.');
+                alert('학번과 이름이 일치하지 않습니다.');
             }
 
             document.getElementById('delete-form').reset();
