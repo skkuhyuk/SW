@@ -170,6 +170,20 @@
 
             tableBody.appendChild(row);
         }
+
+        // 관리자 기능
+        function adminAction(reset) {
+            if (reset) {
+                localStorage.removeItem('attendanceData');
+                location.reload(); // 페이지 새로고침
+                alert('목록을 초기화 합니다.');
+            } else {
+                alert('목록.');
+            }
+        }
+
+        // 관리자가 호출할 함수
+        adminAction(false); // 현재 상태 유지
     </script>
 </body>
 </html>
