@@ -41,7 +41,7 @@
 <body>
     <h1>출석 프로그램</h1>
     <form id="delete-form">
-        <h2>출석</h2>
+        <h2>출석 삭제</h2>
         <label for="student-id">학번:</label>
         <input type="text" id="student-id" required>
         <label for="student-name">이름:</label>
@@ -73,6 +73,14 @@
     <script>
         const VALID_CODE = "156655"; // 모든 학생들이 동일한 코드
 
+        // 초기 데이터 로드
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedData = localStorage.getItem('attendanceData');
+            if (savedData) {
+                document.querySelector('#attendance-table tbody').innerHTML = savedData;
+            }
+        });
+
         document.getElementById('delete-form').addEventListener('submit', function(event) {
             event.preventDefault();
 
@@ -97,10 +105,29 @@
 
             if (!found) {
                 alert('학번과 이름이 일치하지 않습니다.');
+            } else {
+                // 데이터 저장
+                saveData();
             }
 
             document.getElementById('delete-form').reset();
         });
+
+        // 데이터 저장
+        function saveData() {
+            localStorage.setItem('attendanceData', document.querySelector('#attendance-table tbody').innerHTML);
+        }
+
+        // 관리자 기능
+        function adminAction(reset) {
+            if (reset) {
+                localStorage.removeItem('attendanceData');
+                location.reload(); // 페이지 새로고침
+                alert('출석 데이터가 초기화되었습니다.');
+            } else {
+                alert('현재 상태가 유지됩니다.');
+            }
+        }
     </script>
 </body>
 </html>
