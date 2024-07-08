@@ -58,26 +58,59 @@
                 <th>학번</th>
             </tr>
         </thead>
-        <tbody>
-            <tr data-id="20222" data-name="김김김">
-                <td>김김김</td>
-                <td>20222</td>
-            </tr>
-            <tr data-id="21222" data-name="이이이">
-                <td>이이이</td>
-                <td>21222</td>
-            </tr>
+        <tbody id="attendance-list">
+            <!-- 여기에 자동으로 추가될 내용 -->
         </tbody>
     </table>
 
     <script>
         const VALID_CODE = "156655"; // 모든 학생들이 동일한 코드
 
-        // 초기 데이터 로드
+        // 초기 데이터 로드 및 추가
         document.addEventListener('DOMContentLoaded', function() {
             const savedData = localStorage.getItem('attendanceData');
             if (savedData) {
-                document.querySelector('#attendance-table tbody').innerHTML = savedData;
+                document.querySelector('#attendance-list').innerHTML = savedData;
+            } else {
+                // 초기 데이터 추가
+                const initialStudents = [
+                    { id: '2024312878', name: '김군태' },
+                    { id: '2024314431', name: '김민상' },
+                    { id: '2020311767', name: '김민수' },
+                    { id: '2022313695', name: '김범준' },
+                    { id: '2023312434', name: '김성준' },
+                    { id: '2021313124', name: '김원혜' },
+                    { id: '2019310153', name: '김정현' },
+                    { id: '2024312807', name: '박민재' },
+                    { id: '2024312968', name: '박소연' },
+                    { id: '2021315618', name: '박종익' },
+                    { id: '2020312782', name: '박찬규' },
+                    { id: '2021312121', name: '박채연' },
+                    { id: '2023314282', name: '박현서' },
+                    { id: '2024312737', name: '백승준' },
+                    { id: '2023314030', name: '우범종' },
+                    { id: '2020315724', name: '유의민' },
+                    { id: '2022315857', name: '이건우' },
+                    { id: '2022315994', name: '이두형' },
+                    { id: '2019312407', name: '이상유' },
+                    { id: '2021311892', name: '이윤아' },
+                    { id: '2016310179', name: '이재욱' },
+                    { id: '2021313797', name: '임진영' },
+                    { id: '2019312116', name: '정대교' },
+                    { id: '2019311327', name: '정진우' },
+                    { id: '2024314816', name: '조한준' },
+                    { id: '2020313866', name: '조혜준' },
+                    { id: '2019313405', name: '최영준' },
+                    { id: '2021314053', name: '태상빈' },
+                    { id: '2023311242', name: '허윤민' }
+                ];
+
+                initialStudents.forEach(student => {
+                    addStudentToAttendance(student.id, student.name);
+                });
+
+                // 데이터 저장
+                saveData();
             }
         });
 
@@ -93,7 +126,7 @@
                 return;
             }
 
-            const rows = document.querySelectorAll('#attendance-table tbody tr');
+            const rows = document.querySelectorAll('#attendance-list tr');
             let found = false;
 
             rows.forEach(row => {
@@ -115,22 +148,28 @@
 
         // 데이터 저장
         function saveData() {
-            localStorage.setItem('attendanceData', document.querySelector('#attendance-table tbody').innerHTML);
+            localStorage.setItem('attendanceData', document.querySelector('#attendance-list').innerHTML);
         }
 
-        // 관리자 기능
-        function adminAction(reset) {
-            if (reset) {
-                localStorage.removeItem('attendanceData');
-                location.reload(); // 페이지 새로고침
-                alert('목록을 초기화 합니다.');
-            } else {
-                alert('목록 초기화 금지.');
-            }
-        }
+        // 학생을 출석 리스트에 추가하는 함수
+        function addStudentToAttendance(id, name) {
+            const tableBody = document.getElementById('attendance-list');
 
-        // 관리자가 호출할 함수
-        adminAction(false); // 현재 상태 유지
+            const row = document.createElement('tr');
+            row.setAttribute('data-id', id);
+            row.setAttribute('data-name', name);
+
+            const nameCell = document.createElement('td');
+            nameCell.textContent = name;
+
+            const idCell = document.createElement('td');
+            idCell.textContent = id;
+
+            row.appendChild(nameCell);
+            row.appendChild(idCell);
+
+            tableBody.appendChild(row);
+        }
     </script>
 </body>
 </html>
