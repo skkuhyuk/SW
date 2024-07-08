@@ -70,7 +70,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const savedData = localStorage.getItem('attendanceData');
             if (savedData) {
-                document.querySelector('#attendance-list').innerHTML = savedData;
+                document.getElementById('attendance-list').innerHTML = savedData;
             } else {
                 // 초기 데이터 추가
                 const initialStudents = [
@@ -106,10 +106,17 @@
                 ];
 
                 initialStudents.forEach(student => {
-                    addStudentToAttendance(student.id, student.name);
+                    const newRow = document.createElement('tr');
+                    newRow.setAttribute('data-id', student.id);
+                    newRow.setAttribute('data-name', student.name);
+                    newRow.innerHTML = `
+                        <td>${student.name}</td>
+                        <td>${student.id}</td>
+                    `;
+                    document.getElementById('attendance-list').appendChild(newRow);
                 });
 
-                // 데이터 저장
+                // 초기 데이터 저장
                 saveData();
             }
         });
@@ -148,27 +155,7 @@
 
         // 데이터 저장
         function saveData() {
-            localStorage.setItem('attendanceData', document.querySelector('#attendance-list').innerHTML);
-        }
-
-        // 학생을 출석 리스트에 추가하는 함수
-        function addStudentToAttendance(id, name) {
-            const tableBody = document.getElementById('attendance-list');
-
-            const row = document.createElement('tr');
-            row.setAttribute('data-id', id);
-            row.setAttribute('data-name', name);
-
-            const nameCell = document.createElement('td');
-            nameCell.textContent = name;
-
-            const idCell = document.createElement('td');
-            idCell.textContent = id;
-
-            row.appendChild(nameCell);
-            row.appendChild(idCell);
-
-            tableBody.appendChild(row);
+            localStorage.setItem('attendanceData', document.getElementById('attendance-list').innerHTML);
         }
 
         // 관리자 기능
@@ -176,9 +163,9 @@
             if (reset) {
                 localStorage.removeItem('attendanceData');
                 location.reload(); // 페이지 새로고침
-                alert('목록을 초기화 합니다.');
+                alert('출석 데이터가 초기화되었습니다.');
             } else {
-                alert('목록.');
+                alert('현재 상태가 유지됩니다.');
             }
         }
 
