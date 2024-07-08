@@ -159,15 +159,19 @@
         function saveData() {
             localStorage.setItem('attendanceData', document.getElementById('attendance-list').innerHTML);
         }
+
+        // 관리자 기능
         function adminAction(reset) {
             if (reset) {
                 localStorage.removeItem('attendanceData');
                 location.reload(); // 페이지 새로고침
                 alert('출석 데이터가 초기화되었습니다.');
             } else {
-                alert('현재 상태가 유지됩니다.');
+                alert('현재 상태가 유지됩니다!!');
             }
         }
+
+        // 초기 데이터 표시를 위한 호출
         adminAction(false);
     </script>
 </body>
