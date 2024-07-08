@@ -137,14 +137,16 @@
             let found = false;
 
             rows.forEach(row => {
-                if (row.dataset.id === studentId && row.dataset.name === studentName) {
+                const id = row.getAttribute('data-id');
+                const name = row.getAttribute('data-name');
+                if (id === studentId && name === studentName) {
                     row.remove();
                     found = true;
                 }
             });
 
             if (!found) {
-                alert('학번과 이름이 일치하지 않습니다.');
+                alert('학번과 이름이 일치하는 학생이 없습니다.');
             } else {
                 // 데이터 저장
                 saveData();
