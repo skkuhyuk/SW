@@ -36,6 +36,11 @@
         th {
             background-color: #f2f2f2;
         }
+        .admin-section {
+            margin-top: 20px;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -59,68 +64,54 @@
             </tr>
         </thead>
         <tbody id="attendance-list">
-            <!-- 초기 데이터가 자동으로 추가될 예정 -->
+            <!-- Firebase에서 가져온 데이터가 자동으로 추가될 예정 -->
         </tbody>
     </table>
 
+    <div class="admin-section">
+        <h2>관리자 기능</h2>
+        <button onclick="adminAction(true)">출석 데이터 초기화</button>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-database.js"></script>
     <script>
-        const VALID_CODE = "156655"; // 모든 학생들이 동일한 코드
+        // Firebase 구성 정보
+        const firebaseConfig = {
+            apiKey: "Your-API-Key",
+            authDomain: "your-auth-domain.firebaseapp.com",
+            databaseURL: "https://your-database-url.firebaseio.com",
+            projectId: "your-project-id",
+            storageBucket: "your-storage-bucket.appspot.com",
+            messagingSenderId: "your-sender-id",
+            appId: "your-app-id",
+            measurementId: "your-measurement-id"
+        };
 
-        // 초기 데이터 로드 및 추가
-        document.addEventListener('DOMContentLoaded', function() {
-            const savedData = localStorage.getItem('attendanceData');
-            if (savedData) {
-                document.getElementById('attendance-list').innerHTML = savedData;
-            } else {
-                // 초기 데이터 추가
-                const initialStudents = [
-                    { id: '2024312878', name: '김군태' },
-                    { id: '2024314431', name: '김민상' },
-                    { id: '2020311767', name: '김민수' },
-                    { id: '2022313695', name: '김범준' },
-                    { id: '2023312434', name: '김성준' },
-                    { id: '2021313124', name: '김원혜' },
-                    { id: '2019310153', name: '김정현' },
-                    { id: '2024312807', name: '박민재' },
-                    { id: '2024312968', name: '박소연' },
-                    { id: '2021315618', name: '박종익' },
-                    { id: '2020312782', name: '박찬규' },
-                    { id: '2021312121', name: '박채연' },
-                    { id: '2023314282', name: '박현서' },
-                    { id: '2024312737', name: '백승준' },
-                    { id: '2023314030', name: '우범종' },
-                    { id: '2020315724', name: '유의민' },
-                    { id: '2022315857', name: '이건우' },
-                    { id: '2022315994', name: '이두형' },
-                    { id: '2019312407', name: '이상유' },
-                    { id: '2021311892', name: '이윤아' },
-                    { id: '2016310179', name: '이재욱' },
-                    { id: '2021313797', name: '임진영' },
-                    { id: '2019312116', name: '정대교' },
-                    { id: '2019311327', name: '정진우' },
-                    { id: '2024314816', name: '조한준' },
-                    { id: '2020313866', name: '조혜준' },
-                    { id: '2019313405', name: '최영준' },
-                    { id: '2021314053', name: '태상빈' },
-                    { id: '2023311242', name: '허윤민' }
-                ];
+        // Firebase 초기화
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-                initialStudents.forEach(student => {
+        // 출석 리스트 초기화
+        function initAttendanceList() {
+            const attendanceListRef = db.ref('0709'); // 데이터베이스에서 0709 레퍼런스 가져오기
+            attendanceListRef.once('value', snapshot => {
+                snapshot.forEach(childSnapshot => {
+                    const student = childSnapshot.val();
                     const newRow = document.createElement('tr');
-                    newRow.setAttribute('data-id', student.id);
-                    newRow.setAttribute('data-name', student.name);
                     newRow.innerHTML = `
                         <td>${student.name}</td>
                         <td>${student.id}</td>
                     `;
                     document.getElementById('attendance-list').appendChild(newRow);
                 });
+            });
+        }
 
-                // 초기 데이터 저장
-                saveData();
-            }
-        });
+        // 출석 리스트 초기화 호출
+        initAttendanceList();
 
+        // 출석 제출 폼 처리
         document.getElementById('attendance-form').addEventListener('submit', function(event) {
             event.preventDefault();
 
@@ -128,51 +119,57 @@
             const studentName = document.getElementById('student-name').value;
             const studentCode = document.getElementById('student-code').value;
 
-            if (studentCode !== VALID_CODE) {
+            if (studentCode !== '156655') { // 코드 검증
                 alert('올바른 코드를 입력하세요.');
                 return;
             }
 
-            const rows = document.querySelectorAll('#attendance-list tr');
-            let found = false;
-
-            rows.forEach(row => {
-                const id = row.getAttribute('data-id');
-                const name = row.getAttribute('data-name');
-                if (id === studentId && name === studentName) {
-                    row.remove();
-                    found = true;
+            // Firebase에서 학생 찾기
+            const studentsRef = db.ref('0709');
+            studentsRef.once('value', snapshot => {
+                let found = false;
+                snapshot.forEach(childSnapshot => {
+                    const student = childSnapshot.val();
+                    if (student.id === studentId && student.name === studentName) {
+                        found = true;
+                        // 데이터 삭제
+                        childSnapshot.ref.remove()
+                            .then(() => {
+                                alert('학생 정보가 성공적으로 삭제되었습니다.');
+                                location.reload(); // 페이지 새로고침
+                            })
+                            .catch(error => {
+                                console.error('데이터 삭제 중 오류:', error);
+                                alert('데이터 삭제 중 오류가 발생했습니다.');
+                            });
+                    }
+                });
+                if (!found) {
+                    alert('학번과 이름이 일치하는 학생이 없습니다.');
                 }
             });
-
-            if (!found) {
-                alert('학번과 이름이 일치하는 학생이 없습니다.');
-            } else {
-                // 데이터 저장
-                saveData();
-            }
-
-            document.getElementById('attendance-form').reset();
         });
 
-        // 데이터 저장
-        function saveData() {
-            localStorage.setItem('attendanceData', document.getElementById('attendance-list').innerHTML);
-        }
-
-        // 관리자 기능
+        // 관리자 기능 - 출석 데이터 초기화
         function adminAction(reset) {
             if (reset) {
-                localStorage.removeItem('attendanceData');
-                location.reload(); // 페이지 새로고침
-                alert('출석 데이터가 초기화되었습니다.');
+                const confirmation = confirm('출석 데이터를 초기화하시겠습니까?');
+                if (confirmation) {
+                    const attendanceListRef = db.ref('0709');
+                    attendanceListRef.remove()
+                        .then(() => {
+                            alert('출석 데이터가 성공적으로 초기화되었습니다.');
+                            location.reload(); // 페이지 새로고침
+                        })
+                        .catch(error => {
+                            console.error('출석 데이터 초기화 중 오류:', error);
+                            alert('출석 데이터 초기화 중 오류가 발생했습니다.');
+                        });
+                }
             } else {
                 alert('현재 상태가 유지됩니다!!');
             }
         }
-
-        // 초기 데이터 표시를 위한 호출
-        adminAction(false);
     </script>
 </body>
 </html>
