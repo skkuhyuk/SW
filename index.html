@@ -73,7 +73,7 @@
 
     <div class="admin-section">
         <h2>관리자 기능</h2>
-        <button onclick="adminAction(false)">관리자 기능입니다.. ㅜㅜ</button>
+        <button onclick="adminAction(true)">출석 데이터 초기화</button>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
@@ -154,16 +154,26 @@
         // 관리자 기능 - 출석 데이터 초기화
         function adminAction(reset) {
             if (reset) {
-                localStorage.removeItem('attendanceData');
-                location.reload(); // 페이지 새로고침
-                alert('목록을 초기화 합니다.');
+                const confirmation = confirm('출석 데이터를 초기화하시겠습니까?');
+                if (confirmation) {
+                    const attendanceListRef = db.ref('0709');
+                    attendanceListRef.remove()
+                        .then(() => {
+                            alert('출석 데이터가 성공적으로 초기화되었습니다.');
+                            location.reload(); // 페이지 새로고침
+                        })
+                        .catch(error => {
+                            console.error('출석 데이터 초기화 금지:', error);
+                            alert('관리자 기능입니다.');
+                        });
+                }
             } else {
                 alert('목록 초기화 금지.');
             }
         }
 
         // 관리자가 호출할 함수
-        adminAction(true); // 현재 상태 유지
+        adminAction(false); // 현재 상태 유지
     </script>
 </body>
 </html>
