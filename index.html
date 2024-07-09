@@ -71,10 +71,6 @@
         </tbody>
     </table>
 
-    <div class="admin-section">
-        <h2>관리자 기능</h2>
-        <button onclick="adminAction(true)">출석 데이터 초기화</button>
-    </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-database.js"></script>
@@ -167,7 +163,7 @@
         }
 
         // 초기 데이터 표시를 위한 호출
-        adminAction(false); // 현재 상태 유지
+        adminAction(true); // 현재 상태 유지
     </script>
 </body>
 </html>
