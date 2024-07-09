@@ -47,6 +47,8 @@
     <h1>출석 프로그램</h1>
     <form id="attendance-form">
         <h2>출석</h2>
+        <label for="student-idx">인덱스:</label>
+        <input type="number" id="student-idx" min="0" max="29" required>
         <label for="student-id">학번:</label>
         <input type="text" id="student-id" required>
         <label for="student-name">이름:</label>
@@ -59,6 +61,7 @@
     <table id="attendance-table">
         <thead>
             <tr>
+                <th>인덱스</th>
                 <th>이름</th>
                 <th>학번</th>
             </tr>
@@ -78,14 +81,14 @@
     <script>
         // Firebase 구성 정보
         const firebaseConfig = {
-            apiKey: "Your-API-Key",
-            authDomain: "your-auth-domain.firebaseapp.com",
-            databaseURL: "https://your-database-url.firebaseio.com",
-            projectId: "your-project-id",
-            storageBucket: "your-storage-bucket.appspot.com",
-            messagingSenderId: "your-sender-id",
-            appId: "your-app-id",
-            measurementId: "your-measurement-id"
+            apiKey: "AIzaSyC0R_GdbnBGEkA_kkPB-FQJji7hPg1B_Xs",
+            authDomain: "swai-5271f.firebaseapp.com",
+            databaseURL: "https://swai-5271f-default-rtdb.firebaseio.com",
+            projectId: "swai-5271f",
+            storageBucket: "swai-5271f.appspot.com",
+            messagingSenderId: "1071361398458",
+            appId: "1:1071361398458:web:b26612d5da19aca0ed9483",
+            measurementId: "G-ZBVTM1YL07"
         };
 
         // Firebase 초기화
@@ -97,9 +100,11 @@
             const attendanceListRef = db.ref('0709'); // 데이터베이스에서 0709 레퍼런스 가져오기
             attendanceListRef.once('value', snapshot => {
                 snapshot.forEach(childSnapshot => {
+                    const index = childSnapshot.key;
                     const student = childSnapshot.val();
                     const newRow = document.createElement('tr');
                     newRow.innerHTML = `
+                        <td>${index}</td>
                         <td>${student.name}</td>
                         <td>${student.id}</td>
                     `;
@@ -115,6 +120,7 @@
         document.getElementById('attendance-form').addEventListener('submit', function(event) {
             event.preventDefault();
 
+            const studentIdx = document.getElementById('student-idx').value;
             const studentId = document.getElementById('student-id').value;
             const studentName = document.getElementById('student-name').value;
             const studentCode = document.getElementById('student-code').value;
@@ -125,27 +131,22 @@
             }
 
             // Firebase에서 학생 찾기
-            const studentsRef = db.ref('0709');
-            studentsRef.once('value', snapshot => {
-                let found = false;
-                snapshot.forEach(childSnapshot => {
-                    const student = childSnapshot.val();
-                    if (student.id === studentId && student.name === studentName) {
-                        found = true;
-                        // 데이터 삭제
-                        childSnapshot.ref.remove()
-                            .then(() => {
-                                alert('학생 정보가 성공적으로 삭제되었습니다.');
-                                location.reload(); // 페이지 새로고침
-                            })
-                            .catch(error => {
-                                console.error('데이터 삭제 중 오류:', error);
-                                alert('데이터 삭제 중 오류가 발생했습니다.');
-                            });
-                    }
-                });
-                if (!found) {
-                    alert('학번과 이름이 일치하는 학생이 없습니다.');
+            const studentRef = db.ref(`0709/${studentIdx}`);
+            studentRef.once('value', snapshot => {
+                const student = snapshot.val();
+                if (student && student.id === studentId && student.name === studentName) {
+                    // 데이터 삭제
+                    studentRef.remove()
+                        .then(() => {
+                            alert('학생 정보가 성공적으로 삭제되었습니다.');
+                            location.reload(); // 페이지 새로고침
+                        })
+                        .catch(error => {
+                            console.error('데이터 삭제 중 오류:', error);
+                            alert('데이터 삭제 중 오류가 발생했습니다.');
+                        });
+                } else {
+                    alert('인덱스, 학번, 이름이 일치하는 학생이 없습니다.');
                 }
             });
         });
@@ -153,23 +154,16 @@
         // 관리자 기능 - 출석 데이터 초기화
         function adminAction(reset) {
             if (reset) {
-                const confirmation = confirm('출석 데이터를 초기화하시겠습니까?');
-                if (confirmation) {
-                    const attendanceListRef = db.ref('0709');
-                    attendanceListRef.remove()
-                        .then(() => {
-                            alert('출석 데이터가 성공적으로 초기화되었습니다.');
-                            location.reload(); // 페이지 새로고침
-                        })
-                        .catch(error => {
-                            console.error('출석 데이터 초기화 중 오류:', error);
-                            alert('출석 데이터 초기화 중 오류가 발생했습니다.');
-                        });
-                }
+                localStorage.removeItem('attendanceData');
+                location.reload(); // 페이지 새로고침
+                alert('목록을 초기화 합니다.');
             } else {
-                alert('현재 상태가 유지됩니다!!');
+                alert('목록 초기화 금지.');
             }
         }
+
+        // 관리자가 호출할 함수
+        adminAction(false); // 현재 상태 유지
     </script>
 </body>
 </html>
