@@ -71,6 +71,10 @@
         </tbody>
     </table>
 
+    <div class="admin-section">
+        <h2>관리자 기능</h2>
+        <button onclick="adminAction(true)">출석 데이터 초기화</button>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-database.js"></script>
@@ -95,6 +99,9 @@
         function initAttendanceList() {
             const attendanceListRef = db.ref('0709'); // 데이터베이스에서 0709 레퍼런스 가져오기
             attendanceListRef.once('value', snapshot => {
+                const attendanceList = document.getElementById('attendance-list');
+                attendanceList.innerHTML = ''; // 기존 내용을 초기화
+
                 snapshot.forEach(childSnapshot => {
                     const index = childSnapshot.key;
                     const student = childSnapshot.val();
@@ -104,7 +111,7 @@
                         <td>${student.name}</td>
                         <td>${student.id}</td>
                     `;
-                    document.getElementById('attendance-list').appendChild(newRow);
+                    attendanceList.appendChild(newRow);
                 });
             });
         }
@@ -163,7 +170,7 @@
         }
 
         // 초기 데이터 표시를 위한 호출
-        adminAction(true); // 현재 상태 유지
+        adminAction(false); // 현재 상태 유지
     </script>
 </body>
 </html>
