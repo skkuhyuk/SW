@@ -47,8 +47,8 @@
     <h1>출석 프로그램</h1>
     <form id="attendance-form">
         <h2>출석</h2>
-        <label for="student-idx">인덱스:</label>
-        <input type="number" id="student-idx" min="0" max="29" required>
+        <label for="student-index">인덱스:</label>
+        <input type="number" id="student-index" required min="0" max="29">
         <label for="student-id">학번:</label>
         <input type="text" id="student-id" required>
         <label for="student-name">이름:</label>
@@ -120,7 +120,7 @@
         document.getElementById('attendance-form').addEventListener('submit', function(event) {
             event.preventDefault();
 
-            const studentIdx = document.getElementById('student-idx').value;
+            const studentIndex = document.getElementById('student-index').value;
             const studentId = document.getElementById('student-id').value;
             const studentName = document.getElementById('student-name').value;
             const studentCode = document.getElementById('student-code').value;
@@ -131,22 +131,26 @@
             }
 
             // Firebase에서 학생 찾기
-            const studentRef = db.ref(`0709/${studentIdx}`);
+            const studentRef = db.ref(`0709/${studentIndex}`);
             studentRef.once('value', snapshot => {
-                const student = snapshot.val();
-                if (student && student.id === studentId && student.name === studentName) {
-                    // 데이터 삭제
-                    studentRef.remove()
-                        .then(() => {
-                            alert('학생 정보가 성공적으로 삭제되었습니다.');
-                            location.reload(); // 페이지 새로고침
-                        })
-                        .catch(error => {
-                            console.error('데이터 삭제 중 오류:', error);
-                            alert('데이터 삭제 중 오류가 발생했습니다.');
-                        });
+                if (snapshot.exists()) {
+                    const student = snapshot.val();
+                    if (student.id === studentId && student.name === studentName) {
+                        // 데이터 삭제
+                        studentRef.remove()
+                            .then(() => {
+                                alert('학생 정보가 성공적으로 삭제되었습니다.');
+                                location.reload(); // 페이지 새로고침
+                            })
+                            .catch(error => {
+                                console.error('데이터 삭제 중 오류:', error);
+                                alert('데이터 삭제 중 오류가 발생했습니다.');
+                            });
+                    } else {
+                        alert('학번과 이름이 일치하지 않습니다.');
+                    }
                 } else {
-                    alert('인덱스, 학번, 이름이 일치하는 학생이 없습니다.');
+                    alert('해당 인덱스의 학생 정보가 없습니다.');
                 }
             });
         });
@@ -154,26 +158,16 @@
         // 관리자 기능 - 출석 데이터 초기화
         function adminAction(reset) {
             if (reset) {
-                const confirmation = confirm('출석 데이터를 초기화하시겠습니까?');
-                if (confirmation) {
-                    const attendanceListRef = db.ref('0709');
-                    attendanceListRef.remove()
-                        .then(() => {
-                            alert('출석 데이터가 성공적으로 초기화되었습니다.');
-                            location.reload(); // 페이지 새로고침
-                        })
-                        .catch(error => {
-                            console.error('출석 데이터 초기화 금지:', error);
-                            alert('관리자 기능입니다.');
-                        });
-                }
+                localStorage.removeItem('attendanceData');
+                location.reload(); // 페이지 새로고침
+                alert('목록을 초기화 합니다.');
             } else {
                 alert('목록 초기화 금지.');
             }
         }
 
-        // 관리자가 호출할 함수
-        adminAction(true); // 현재 상태 유지
+        // 초기 데이터 표시를 위한 호출
+        adminAction(false); // 현재 상태 유지
     </script>
 </body>
 </html>
